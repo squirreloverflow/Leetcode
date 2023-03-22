@@ -46,22 +46,27 @@ using namespace std;
 class Solution {
 public:
     int networkDelayTime(vector<vector<int>>& times, int N, int K) {
+        // 构建邻接表表示的图
         unordered_map<int, vector<pair<int, int>>> graph;
         for (const auto& edge : times) {
             graph[edge[0]].emplace_back(edge[1], edge[2]);
         }
 
+        // 使用优先队列作为最小堆存储距离值和节点
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
         pq.emplace(0, K);
 
+        // 用来存储源节点到其他节点的最短距离
         unordered_map<int, int> dist;
         while (!pq.empty()) {
             int time = pq.top().first;
             int node = pq.top().second;
             pq.pop();
 
+            // 如果节点尚未访问，将其添加到 dist 中
             if (dist.find(node) == dist.end()) {
                 dist[node] = time;
+                // 遍历邻接节点，将它们的距离值添加到优先队列中
                 for (const auto& neighbor : graph[node]) {
                     int next_node = neighbor.first;
                     int edge_time = neighbor.second;
@@ -72,6 +77,7 @@ public:
             }
         }
 
+        // 如果所有节点都已访问，返回最大的距离值，否则返回 -1
         if (dist.size() != N) return -1;
         int ans = 0;
         for (const auto& kv : dist) {
@@ -80,10 +86,11 @@ public:
         return ans;
     }
 };
+
 ```
 python:  
 上文原理中将所有未更新节点都设为了无穷，实际代码中不一定需要这样设置，知识强调了如何更新节点的顺序，下例中用了最小堆，所有已经至少被更新了一次距离值的节点才会被更新最小堆中，而更‘远处’的节点一定还没有更新。  
-```
+```python
 import heapq
 from collections import defaultdict
 
