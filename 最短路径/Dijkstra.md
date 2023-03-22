@@ -81,29 +81,36 @@ public:
     }
 };
 ```
-python:
-```python
+python:  
+上文原理中将所有未更新节点都设为了无穷，实际代码中不一定需要这样设置，知识强调了如何更新节点的顺序，下例中用了最小堆，所有已经至少被更新了一次距离值的节点才会被更新最小堆中，而更‘远处’的节点一定还没有更新。  
+```
 import heapq
 from collections import defaultdict
 
 class Solution:
     def networkDelayTime(self, times: List[List[int]], N: int, K: int) -> int:
+        # 构建邻接表表示的图
         graph = defaultdict(list)
         for u, v, w in times:
             graph[u].append((v, w))
 
+        # 使用优先队列作为最小堆存储距离值和节点
         pq = [(0, K)]
+        # 用来存储源节点到其他节点的最短距离
         dist = {}
 
         while pq:
             time, node = heapq.heappop(pq)
 
+            # 如果节点尚未访问，将其添加到 dist 中
             if node not in dist:
                 dist[node] = time
+                # 遍历邻接节点，将它们的距离值添加到优先队列中
                 for next_node, edge_time in graph[node]:
                     if next_node not in dist:
                         heapq.heappush(pq, (time + edge_time, next_node))
 
+        # 如果所有节点都已访问，返回最大的距离值，否则返回 -1
         if len(dist) != N:
             return -1
 
